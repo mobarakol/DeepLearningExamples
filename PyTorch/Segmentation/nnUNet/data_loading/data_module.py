@@ -47,10 +47,15 @@ class DataModule(LightningDataModule):
         self.train_imgs, self.train_lbls, self.val_imgs, self.val_lbls, self.test_imgs = ([],) * 5
 
     def setup(self, stage=None):
-        meta = load_data(self.data_path, "*_meta.npy")
-        orig_lbl = load_data(self.data_path, "*_orig_lbl.npy")
-        imgs, lbls = load_data(self.data_path, "*_x.npy"), load_data(self.data_path, "*_y.npy")
-        self.test_imgs, test_meta = get_test_fnames(self.args, self.data_path, meta)
+        if self.args.exec_mode == "predict":
+            eta = load_data(self.data_path, "*_meta.npy")
+            imgs = load_data(self.data_path, "*_x.npy")
+            self.test_imgs, test_meta = get_test_fnames(self.args, self.data_path, meta)
+        else:
+            meta = load_data(self.data_path, "*_meta.npy")
+            orig_lbl = load_data(self.data_path, "*_orig_lbl.npy")
+            imgs, lbls = load_data(self.data_path, "*_x.npy"), load_data(self.data_path, "*_y.npy")
+            self.test_imgs, test_meta = get_test_fnames(self.args, self.data_path, meta)
 
         if self.args.exec_mode != "predict" or self.args.benchmark:
             train_idx, val_idx = list(self.kfold.split(imgs))[self.args.fold]
