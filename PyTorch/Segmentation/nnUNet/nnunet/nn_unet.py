@@ -19,7 +19,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from apex.optimizers import FusedAdam, FusedSGD
-from data_loading.data_module import get_data_path, get_test_fnames
+from data_loading.data_module import get_data_path, get_test_fnames_predict
 from monai.inferers import sliding_window_inference
 from monai.networks.nets import DynUNet
 from nnunet.brats22_model import UNet3D
@@ -301,7 +301,7 @@ class NNUnet(pl.LightningModule):
     def save_mask(self, pred):
         if self.test_idx == 0:
             data_path = get_data_path(self.args)
-            self.test_imgs, _ = get_test_fnames(self.args, data_path)
+            self.test_imgs, _ = get_test_fnames_predict(self.args, data_path)
         fname = os.path.basename(self.test_imgs[self.test_idx]).replace("_x", "")
         np.save(os.path.join(self.save_dir, fname), pred, allow_pickle=False)
         self.test_idx += 1
